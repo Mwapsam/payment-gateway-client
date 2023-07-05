@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import {
   Button,
   Dialog,
@@ -9,19 +9,10 @@ import {
   CardFooter,
   Typography,
   Input,
-  Checkbox,
-  Alert,
 } from "@material-tailwind/react";
-import { CheckCircleIcon } from "@heroicons/react/24/solid";
-import { AppDispatch, RootState } from "../../store/store";
+import { AppDispatch } from "../../store/store";
 import { postUser } from "../../services/users.service";
-
-interface User {
-  name: string;
-  email: string;
-  phone_number: string;
-  password: string;
-}
+import { User } from "../../types";
 
 const user: User = {
   name: '',
@@ -33,6 +24,7 @@ const user: User = {
 const Register = () => {
     const [open, setOpen] = React.useState(false);
     const handleOpen = () => setOpen((cur) => !cur);
+    const [error, setError] = useState("")
 
     const [state, setState] = useState(user);
 
@@ -44,18 +36,25 @@ const Register = () => {
 
     const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
-      console.log(state);
-
-      const formData = new FormData();
-      formData.append("name", state.name);
-      formData.append("email", state.email);
-      formData.append("phone_number", state.phone_number);
-      formData.append("password", state.password);
-      
-      dispatch(postUser(formData));
-      setState(user);
-      setOpen(false);
-    }
+    
+      const userData: User = {
+        name: state.name,
+        email: state.email,
+        phone_number: state.phone_number,
+        password: state.password
+      };
+    
+      dispatch(postUser(userData))
+        .unwrap()
+        .then(() => {
+          setState(user);
+          setOpen(false);
+        })
+        .catch(error => {
+          const errorMessage = error as string;
+          setError(errorMessage);
+        });
+    };    
 
     return (
       <React.Fragment>
@@ -83,22 +82,13 @@ const Register = () => {
                 <Input label="Phone Number" name="phone_number" size="lg" value={state.phone_number} onChange={onStateChange} />
                 <Input label="Password" name="password" size="lg" value={state.password} onChange={onStateChange} type="password" />
               </CardBody>
+              {error && <p className="text-red-600 text-center font-thin">{error}</p>}
               <CardFooter className="pt-0">
                 <Button variant="gradient" type="submit" fullWidth>
                   Register
                 </Button>
-                <Typography variant="small" className="mt-6 flex justify-center">
-                  Agree to our terms & conditions
-                  <Typography
-                    as="a"
-                    href="#signup"
-                    variant="small"
-                    color="blue"
-                    className="ml-1 font-bold"
-                    onClick={handleOpen}
-                  >
-                    Register
-                  </Typography>
+                <Typography variant="small" className="mt-6 text-center">
+                  By signing up you agree to our terms & conditions
                 </Typography>
               </CardFooter>
             </form>

@@ -12,7 +12,7 @@ interface StatisticsCardProps {
   color?: string;
   icon: ReactNode;
   title: ReactNode;
-  value: ReactNode;
+  // value: ReactNode;
   footer?: ReactNode;
 }
 
@@ -20,7 +20,7 @@ const StatisticsCard: React.FC<StatisticsCardProps> = ({
   color = "blue",
   icon,
   title,
-  value,
+  // value,
   footer,
 }) => {
   return (
@@ -37,7 +37,7 @@ const StatisticsCard: React.FC<StatisticsCardProps> = ({
           {title}
         </Typography>
         <Typography variant="h4" color="blue-gray">
-          {value}
+          {/* {value} */}
         </Typography>
       </CardBody>
       {footer && (
@@ -74,7 +74,7 @@ StatisticsCard.propTypes = {
   ]),
   icon: PropTypes.node.isRequired,
   title: PropTypes.node.isRequired,
-  value: PropTypes.node.isRequired,
+  // value: PropTypes.node.isRequired,
   footer: PropTypes.node,
 };
 

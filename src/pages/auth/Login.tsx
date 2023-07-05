@@ -14,13 +14,9 @@ import {
 } from "@material-tailwind/react";
 import { AppDispatch } from "../../store/store";
 import { loginUser } from "../../services/users.service";
+import { UserLogin } from "../../types";
 
-interface User {
-  phone_number: string;
-  password: string;
-}
-
-const user: User = {
+const user: UserLogin = {
   phone_number: '',
   password: ''
 };
@@ -40,13 +36,13 @@ const Login = () => {
 
     const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
-      console.log(state);
 
-      const formData = new FormData();
-      formData.append("phone_number", state.phone_number);
-      formData.append("password", state.password);
+      const userData: UserLogin = {
+        phone_number: state.phone_number,
+        password: state.password
+      }
       
-      dispatch(loginUser(formData)).
+      dispatch(loginUser(userData)).
       then((response) => {
         if (response.type === 'user/login/fulfilled'){
           navigate('/dashboard');
@@ -54,7 +50,7 @@ const Login = () => {
       }
       )
       setState(user);
-      setOpen(false);
+      // setOpen(false);
     }
    
     return (
@@ -93,7 +89,6 @@ const Login = () => {
                     variant="small"
                     color="blue"
                     className="ml-1 font-bold"
-                    onClick={handleOpen}
                   >
                     Register
                   </Typography>

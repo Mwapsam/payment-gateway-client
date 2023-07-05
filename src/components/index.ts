@@ -16,6 +16,8 @@ import conversationsData from "./data/conversationsData";
 import Project from "./modals/Project";
 import Block from "./api-doc/Block";
 import SideNav from "./api-doc/SideNav";
+import FeesCard from "./widgets/feesCard";
+import AddFees from "./modals/AddFees";
 
 export { 
     Nav, 
@@ -35,5 +37,7 @@ export {
     MessageCard,
     Project,
     SideNav,
-    Block
+    Block,
+    FeesCard,
+    AddFees
 }

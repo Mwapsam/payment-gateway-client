@@ -1,54 +1,63 @@
-import React from 'react';
+import { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import {
   Card,
   CardBody,
-  CardHeader,
-  CardFooter,
   Avatar,
   Typography,
-  Tabs,
-  TabsHeader,
-  Tab,
-  Switch,
-  Tooltip,
   Button,
 } from "@material-tailwind/react";
-import {
-  HomeIcon,
-  ChatBubbleLeftEllipsisIcon,
-  Cog6ToothIcon,
-  PencilIcon,
-} from "@heroicons/react/24/solid";
-import { Link } from "react-router-dom";
-import { platformSettingsData, conversationsData, projectsData, ProfileInfoCard, MessageCard, Project } from '../../components';
+import { MessageCard, Project } from '../../components';
+import { AppDispatch, RootState } from '../../store/store';
+import { getProjects } from '../../services/projects.service';
 
-type Props = {}
+interface Props {
+  user: any
+}
 
 const Account = (props: Props) => {
+  const { projects } = useSelector((state: RootState) => state.projects);
+  const dispatch = useDispatch<AppDispatch>();
+
+  const [showApiKeys, setShowApiKeys] = useState<boolean[]>([]);
+
+  const toggleApiKeys = (index: number) => {
+    setShowApiKeys(prevState =>
+      prevState.map((value, i) => (i === index ? !value : value))
+    );
+  };
+
+  useEffect(() => {
+    dispatch(getProjects());
+  }, []);
+
+  useEffect(() => {
+    setShowApiKeys(projects?.map(() => false));
+  }, [projects]);
+
+  const { user } = props;
+
   return (
     <>
-      {/* <div className="relative mt-4 h-32 w-full overflow-hidden rounded-xl bg-[url(https://images.unsplash.com/photo-1531512073830-ba890ca4eba2?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80)] bg-cover	bg-center">
-        <div className="absolute inset-0 h-full w-full bg-blue-500/50" />
-      </div> */}
       <Card className="mx-3 mt-6 mb-6 lg:mx-4">
         <CardBody className="p-4">
           <div className="mb-10 flex flex-col lg:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-6">
               <Avatar
-                src="/img/bruce-mars.jpeg"
+                src="/img/user.png"
                 alt="bruce-mars"
-                size="xl"
+                size="lg"
                 className="rounded-lg shadow-lg shadow-blue-gray-500/40"
               />
               <div>
                 <Typography variant="h5" color="blue-gray" className="mb-1">
-                  Richard Davis
+                  {user?.name}
                 </Typography>
                 <Typography
                   variant="small"
                   className="font-normal text-blue-gray-600"
                 >
-                  CEO / Co-Founder
+                 {user?.role}
                 </Typography>
               </div>
             </div>
@@ -56,152 +65,46 @@ const Account = (props: Props) => {
               <Project />
             </div>
           </div>
-          <div className="gird-cols-1 mb-12 grid gap-12 px-4 lg:grid-cols-2 xl:grid-cols-3">
-            <div>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 px-4 lg:grid-flow-row lg:gap-6 xl:gap-12">
+            <div className="col-span-2">
               <Typography variant="h6" color="blue-gray" className="mb-3">
-                Platform Settings
-              </Typography>
-              <div className="flex flex-col gap-12">
-                {platformSettingsData.map(({ title, options }) => (
-                  <div key={title}>
-                    <Typography className="mb-4 block text-xs font-semibold uppercase text-blue-gray-500">
-                      {title}
-                    </Typography>
-                    <div className="flex flex-col gap-6">
-                      {options.map(({ checked, label }) => (
-                        <Switch
-                          key={label}
-                          id={label}
-                          label={label}
-                          defaultChecked={checked}
-                          labelProps={{
-                            className: "text-sm font-normal text-blue-gray-500",
-                          }}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <ProfileInfoCard
-              title="Profile Information"
-              description="Hi, I'm Alec Thompson, Decisions: If you can't decide, the answer is no. If two equally difficult paths, choose the one more painful in the short term (pain avoidance is creating an illusion of equality)."
-              details={{
-                "first name": "Alec M. Thompson",
-                mobile: "(44) 123 1234 123",
-                email: "alecthompson@mail.com",
-                location: "USA",
-                social: (
-                  <div className="flex items-center gap-4">
-                    <i className="fa-brands fa-facebook text-blue-700" />
-                    <i className="fa-brands fa-twitter text-blue-400" />
-                    <i className="fa-brands fa-instagram text-purple-500" />
-                  </div>
-                ),
-              }}
-              action={
-                <Tooltip content="Edit Profile">
-                  <PencilIcon className="h-4 w-4 cursor-pointer text-blue-gray-500" />
-                </Tooltip>
-              }
-            />
-            <div>
-              <Typography variant="h6" color="blue-gray" className="mb-3">
-                Platform Settings
+                API Keys Management
               </Typography>
               <ul className="flex flex-col gap-6">
-                {conversationsData.map((props) => (
+                {projects?.map((project, index) => (
                   <MessageCard
-                    key={props.name}
-                    {...props}
+                    key={project.id}
+                    name={project.name}
+                    api_key={project.api_key}
                     action={
-                      <Button variant="text" size="sm">
-                        Edit
+                      <Button
+                        variant="text"
+                        size="sm"
+                        onClick={() => toggleApiKeys(index)}
+                      >
+                        {showApiKeys[index] ? 'Hide' : 'Show'} API Key
                       </Button>
                     }
+                    showApiKeys={showApiKeys[index]}
                   />
                 ))}
               </ul>
             </div>
-          </div>
-          {/* <div className="px-4 pb-4">
-            <Typography variant="h6" color="blue-gray" className="mb-2">
-              Projects
-            </Typography>
-            <Typography
-              variant="small"
-              className="font-normal text-blue-gray-500"
-            >
-              Architects design houses
-            </Typography>
-            <div className="mt-6 grid grid-cols-1 gap-12 md:grid-cols-2 xl:grid-cols-4">
-              {projectsData.map(
-                ({ img, title, description, tag, route, members }) => (
-                  <Card key={title} color="transparent" shadow={false}>
-                    <CardHeader
-                      floated={false}
-                      color="gray"
-                      className="mx-0 mt-0 mb-4 h-64 xl:h-40"
-                    >
-                      <img
-                        src={img}
-                        alt={title}
-                        className="h-full w-full object-cover"
-                      />
-                    </CardHeader>
-                    <CardBody className="py-0 px-1">
-                      <Typography
-                        variant="small"
-                        className="font-normal text-blue-gray-500"
-                      >
-                        {tag}
-                      </Typography>
-                      <Typography
-                        variant="h5"
-                        color="blue-gray"
-                        className="mt-1 mb-2"
-                      >
-                        {title}
-                      </Typography>
-                      <Typography
-                        variant="small"
-                        className="font-normal text-blue-gray-500"
-                      >
-                        {description}
-                      </Typography>
-                    </CardBody>
-                    <CardFooter className="mt-6 flex items-center justify-between py-0 px-1">
-                      <Link to={route}>
-                        <Button variant="outlined" size="sm">
-                          view project
-                        </Button>
-                      </Link>
-                      <div>
-                        {members.map(({ img, name }, key) => (
-                          <Tooltip key={name} content={name}>
-                            <Avatar
-                              src={img}
-                              alt={name}
-                              size="xs"
-                              variant="circular"
-                              className={`cursor-pointer border-2 border-white ${
-                                key === 0 ? "" : "-ml-2.5"
-                              }`}
-                            />
-                          </Tooltip>
-                        ))}
-                      </div>
-                    </CardFooter>
-                  </Card>
-                )
-              )}
+            <div  className="lg:col-span-1">
+              <div className="w-full lg:w-64">
+                <Typography variant="h6" color="blue-gray" className="mb-3">
+                  Warning
+                </Typography>
+                <Typography className="text-sm text-red-500">
+                  Keep your API keys securely and avoid sharing them with unauthorized individuals. They provide access to sensitive data and functionality of your projects.
+                </Typography>
+              </div>
             </div>
-          </div> */}
+          </div>
         </CardBody>
       </Card>
     </>
-  )
+  );
 }
 
-export default Account
+export default Account;

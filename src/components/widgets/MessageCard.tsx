@@ -1,23 +1,37 @@
-import React, { ReactNode } from "react";
+import React, { ReactNode, useState } from "react";
 import PropTypes from "prop-types";
-import { Avatar, Typography } from "@material-tailwind/react";
+import { Typography, Button } from "@material-tailwind/react";
 
 interface MessageCardProps {
-  img: string;
   name: string;
-  message: ReactNode;
+  api_key: string;
   action?: ReactNode;
+  showApiKeys: boolean;
 }
 
-function MessageCard({ img, name, message, action }: MessageCardProps) {
+function MessageCard({ name, action, api_key, showApiKeys }: MessageCardProps) {
+  const [isCopied, setIsCopied] = useState(false);
+
+  const getApiKeyDisplay = () => {
+    if (showApiKeys) {
+      return "api_key: " + api_key;
+    } else {
+      return "*".repeat(api_key.length);
+    }
+  };
+
+  const handleCopyApiKey = () => {
+    navigator.clipboard.writeText(api_key);
+    setIsCopied(true);
+  
+    setTimeout(() => {
+      setIsCopied(false);
+    }, 2000);
+  };  
+
   return (
     <div className="flex items-center justify-between gap-4">
       <div className="flex items-center gap-4">
-        <Avatar
-          src={img}
-          alt={name}
-          className="shadow-lg shadow-blue-gray-500/25"
-        />
         <div>
           <Typography
             variant="small"
@@ -26,9 +40,19 @@ function MessageCard({ img, name, message, action }: MessageCardProps) {
           >
             {name}
           </Typography>
-          <Typography className="text-xs font-normal text-blue-gray-400">
-            {message}
-          </Typography>
+          <div className="flex items-center gap-2">
+            <p className='text-gray-500'>{getApiKeyDisplay()}</p>
+            {showApiKeys && (
+              <Button
+                variant="outlined"
+                color="blue"
+                size="sm"
+                onClick={handleCopyApiKey}
+              >
+                {isCopied ? "Copied" : "Copy"}
+              </Button>
+            )}
+          </div>
         </div>
       </div>
       {action}
@@ -41,9 +65,7 @@ MessageCard.defaultProps = {
 };
 
 MessageCard.propTypes = {
-  img: PropTypes.string.isRequired,
   name: PropTypes.string.isRequired,
-  message: PropTypes.node.isRequired,
   action: PropTypes.node,
 };
 

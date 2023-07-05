@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { loginUser, getUsers } from '../services/users.service';
+import { loginUser, getUsers, getUser } from '../services/users.service';
 
 type SliceState = { 
     user: any
@@ -30,13 +30,15 @@ const sessionSlice = createSlice({
         builder.addCase(loginUser.rejected, (state, action) => {
             state.loading = 'failed';
             state.isAuthenticated = false;
-            state.error = action.error.message!
+            
+            // state.error = action.error.message!
         });
 
         builder.addCase(loginUser.fulfilled, (state, action) => {
             state.loading = 'succeeded'
             state.isAuthenticated = true;
             state.user = action.payload;
+            
         });
 
         builder.addCase(getUsers.pending, (state, action) => {
@@ -71,6 +73,23 @@ const sessionSlice = createSlice({
         //     window.history.pushState({}, '', '/');
         //     window.location.reload();
         // });
+        
+        builder.addCase(getUser.pending, (state, action) => {
+            state.loading = 'pending';
+            state.isAuthenticated = false;
+        });
+
+        builder.addCase(getUser.rejected, (state, action) => {
+            state.loading = 'failed';
+            state.isAuthenticated = false;
+            state.error = action.error.message!
+        });
+
+        builder.addCase(getUser.fulfilled, (state, action) => {
+            state.loading = 'succeeded'
+            state.isAuthenticated = true;            
+            state.user = action.payload;
+        });
     }
 })
 
